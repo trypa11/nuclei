@@ -388,10 +388,7 @@ func GetGlobalParamsForSecurityRequirement(schema *openapi3.T, requirement *open
 	if len(schema.Components.SecuritySchemes) == 0 {
 		return nil, errorutil.NewWithTag("openapi", "security requirements (%+v) without any security schemes found in openapi file", schema.Security)
 	}
-	// If the requirement is empty, return an empty list of parameters
-	if requirement == nil || len(*requirement) == 0 {
-		return globalParams, nil
-	}
+
 	found := false
 	// this api is protected for each security scheme pull its corresponding scheme
 schemaLabel:
