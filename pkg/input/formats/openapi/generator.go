@@ -388,6 +388,10 @@ func GetGlobalParamsForSecurityRequirement(schema *openapi3.T, requirement *open
 	if len(schema.Components.SecuritySchemes) == 0 {
 		return nil, errorutil.NewWithTag("openapi", "security requirements (%+v) without any security schemes found in openapi file", schema.Security)
 	}
+	// If the requirement is empty, return an empty list of parameters
+	if requirement == nil || len(*requirement) == 0 {
+		return globalParams, nil
+	}
 	found := false
 	// this api is protected for each security scheme pull its corresponding scheme
 schemaLabel:
@@ -426,18 +430,18 @@ func GenerateParameterFromSecurityScheme(scheme *openapi3.SecuritySchemeRef) (*o
 		if !generic.EqualsAny(scheme.Value.Scheme, "basic", "bearer") {
 			return nil, errorutil.NewWithTag("openapi", "unsupported security scheme (%s) found in openapi file", scheme.Value.Scheme)
 		}
-		if scheme.Value.Name == "" {
+		if scheme.Value.Scheme == "" {
 			return nil, errorutil.NewWithTag("openapi", "security scheme (%s) name is empty", scheme.Value.Scheme)
 		}
 		// create parameters using the scheme
 		switch scheme.Value.Scheme {
 		case "basic":
-			h := openapi3.NewHeaderParameter(scheme.Value.Name)
+			h := openapi3.NewHeaderParameter(scheme.Value.Scheme)
 			h.Required = true
 			h.Description = globalAuth // differentiator for normal variables and global auth
 			return h, nil
 		case "bearer":
-			h := openapi3.NewHeaderParameter(scheme.Value.Name)
+			h := openapi3.NewHeaderParameter(scheme.Value.Scheme)
 			h.Required = true
 			h.Description = globalAuth // differentiator for normal variables and global auth
 			return h, nil
